@@ -10,10 +10,10 @@ import os
 import time
 
 
-def wx_xyz_max_min_multiprocess(wc_paths, ch0_maxs, ch0_mins, ch1_maxs, ch1_mins, ch2_maxs, ch2_mins, core_amount, task_amount):
-    multi_processing_interface(core_amount=core_amount, task_amount=task_amount, task=wc_xyz_max_min, task_args=[wc_paths, ch0_maxs, ch0_mins, ch1_maxs, ch1_mins, ch2_maxs, ch2_mins], print_msg=True)
+def wx_xyz_min_max_multiprocess(wc_paths, ch0_maxs, ch0_mins, ch1_maxs, ch1_mins, ch2_maxs, ch2_mins, core_amount, task_amount):
+    multi_processing_interface(core_amount=core_amount, task_amount=task_amount, task=wc_xyz_min_max, task_args=[wc_paths, ch0_maxs, ch0_mins, ch1_maxs, ch1_mins, ch2_maxs, ch2_mins], print_msg=True)
 
-def wc_xyz_max_min(start_index, amount, wc_paths, ch0_maxs, ch0_mins, ch1_maxs, ch1_mins, ch2_maxs, ch2_mins):
+def wc_xyz_min_max(start_index, amount, wc_paths, ch0_maxs, ch0_mins, ch1_maxs, ch1_mins, ch2_maxs, ch2_mins):
     wcs = []
     # start_index = 0
     # amount = 100
@@ -66,7 +66,7 @@ if(__name__ == "__main__"):
         ch2_mins = manager.list()  # []
         core_amount = wc_amount // 150
         task_amount = wc_amount
-        wx_xyz_max_min_multiprocess(wc_paths, ch0_maxs, ch0_mins, ch1_maxs, ch1_mins, ch2_maxs, ch2_mins, core_amount=core_amount, task_amount=task_amount)
+        wx_xyz_min_max_multiprocess(wc_paths, ch0_maxs, ch0_mins, ch1_maxs, ch1_mins, ch2_maxs, ch2_mins, core_amount=core_amount, task_amount=task_amount)
 
         print("ch0_maxs:", ch0_maxs)
         print("ch0_mins:", ch0_mins)
