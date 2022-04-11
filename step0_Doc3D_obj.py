@@ -1,3 +1,20 @@
+#############################################################################################################################################################################################################
+#############################################################################################################################################################################################################
+### 把 kong_model2 加入 sys.path
+import os
+code_exe_path = os.path.realpath(__file__)                   ### 目前執行 step10_b.py 的 path
+code_exe_path_element = code_exe_path.split("\\")            ### 把 path 切分 等等 要找出 kong_model 在第幾層
+kong_layer = code_exe_path_element.index("kong_model2")      ### 找出 kong_model2 在第幾層
+kong_model2_dir = "\\".join(code_exe_path_element[:kong_layer + 1])  ### 定位出 kong_model2 的 dir
+import sys                                                   ### 把 kong_model2 加入 sys.path
+sys.path.append(kong_model2_dir)
+sys.path.append(kong_model2_dir + "/kong_util")
+# print(__file__.split("\\")[-1])
+# print("    code_exe_path:", code_exe_path)
+# print("    code_exe_path_element:", code_exe_path_element)
+# print("    kong_layer:", kong_layer)
+# print("    kong_model2_dir:", kong_model2_dir)
+#############################################################################################################################################################################################################
 import os
 import numpy as np
 import sys
@@ -5,6 +22,8 @@ sys.path.append("../kong_util")
 from build_dataset_combine import Check_dir_exist_and_build_new_dir
 import shutil
 from tqdm import tqdm
+
+from kong_util.build_dataset_combine import Check_dir_exist_and_build_new_dir, Check_dir_exist_and_build
 
 class Doc3D:
     '''
@@ -16,9 +35,9 @@ class Doc3D:
     def __init__(self, root):
         self.db_root = root  ### Doc3D
         self._page_names = None
-        self._img_paths = None
-        self._wc_paths = None
-        self._uv_paths = None
+        self._img_paths  = None
+        self._wc_paths   = None
+        self._uv_paths   = None
         # self.get_page_names_and_paths()   ### 不要在這邊直接呼叫，我下面會建立 real_doc3D物件， 在這邊呼叫就代表一定要插 2T Doc3D 硬碟 才能跑！
         ### 所以改成 跟try_forward 一樣， 寫成 property 的感覺囉！
 
@@ -45,9 +64,9 @@ class Doc3D:
     def get_page_names_and_paths(self):
         print("get_page_names_and_paths here~~~~~ should just be used only once!應該只會被用到一次")
         self._page_names = []
-        self._img_paths = []
-        self._wc_paths = []
-        self._uv_paths = []
+        self._img_paths  = []
+        self._wc_paths   = []
+        self._uv_paths   = []
         train_name_dirs = [self.db_root + "/img/%i" % i for i in range(1, 22)]  ### ["F:/swat3D/1", "F:/swat3D/2", ..., "F:/swat3D/21"]
         for i , name_dir in enumerate(train_name_dirs):
             dir_id = i + 1
@@ -55,9 +74,9 @@ class Doc3D:
             for name in names:
                 page_name = str(dir_id) + "/" + name[: -4]  ### 去掉副檔名 和 加上 dir_id，比如 21/1000_1-cp_Page_0179-r8T0001 就是一個 page_name
                 self._page_names.append(page_name)  ### [21/1000_1-cp_Page_0179-r8T0001, 21/105_3-ny_Page_850-02a0001, ... ]
-                self._img_paths.append(self.db_root + "/img/" + page_name + ".png" )
-                self._wc_paths.append(self.db_root + "/wc/" + page_name + ".exr" )
-                self._uv_paths.append(self.db_root + "/uv/" + page_name + ".exr" )
+                self._img_paths .append(self.db_root + "/img/" + page_name + ".png" )
+                self._wc_paths  .append(self.db_root + "/wc/"  + page_name + ".exr" )
+                self._uv_paths  .append(self.db_root + "/uv/"  + page_name + ".exr" )
             names.sort(key=lambda name: ("%04i" % int(name.split("_")[0]) + "%04i" % int(name.split("_")[1].split("-")[0]) + name.split("_")[2].split("-")[0]))  ### 這一步只是想把 list 內容物 的順序 弄得很像 windows 資料夾內的 排序方式比較好找資料，省略也沒關係喔！
 
 
@@ -81,9 +100,9 @@ class Real_Doc3D(Doc3D):
         build_dir_fake_amount：Doc3D總共有21個資料夾，美個資料夾抓出前 多少筆 data 複製出來
         '''
         ### 決定 ord_paths
-        if(dir_key == "img"): ord_paths = self.img_paths
-        elif(dir_key == "wc"): ord_paths = self.wc_paths
-        elif(dir_key == "uv"): ord_paths = self.uv_paths
+        if  (dir_key == "img"): ord_paths = self.img_paths
+        elif(dir_key == "wc" ): ord_paths = self.wc_paths
+        elif(dir_key == "uv" ): ord_paths = self.uv_paths
 
         ### 決定 副檔名
         if(dir_key in ["wc", "uv", "bm", "norm", "dmap"]): extend_name = ".exr"
