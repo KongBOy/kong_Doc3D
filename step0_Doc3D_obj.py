@@ -17,9 +17,6 @@ sys.path.append(kong_model2_dir + "/kong_util")
 #############################################################################################################################################################################################################
 import os
 import numpy as np
-import sys
-sys.path.append("../kong_util")
-from build_dataset_combine import Check_dir_exist_and_build_new_dir
 import shutil
 from tqdm import tqdm
 
@@ -91,7 +88,7 @@ class Real_Doc3D(Doc3D):
 
 
 
-    def _make_fake_some_db(self, dir_key, dst_dir, build_dir_fake_amount=1, print_msg=False):
+    def _make_fake_some_db(self, dir_key, dst_dir, build_dir_fake_amount=1, sep_dir=True, print_msg=False):
         # self.get_page_names_and_paths()
         '''
         寫的general一些，可以套用到 alb, bm, dmap, img, norm, recon, uv, wc
@@ -124,29 +121,32 @@ class Real_Doc3D(Doc3D):
             dir_lower_u = min(upper_bounds[dir_index], upper_bounds_max[dir_index])  ### 取出 某號資料夾的 upper_bound，如果超過 upper_bound_max， 就取upper_bound_max
             dir_name = dir_index + 1                                                 ### 資料夾名是 1~21， 但 index 是 0~20， 所以要 +1
 
-            Check_dir_exist_and_build_new_dir(fake_dst_dir + "/" + str(dir_name))    ### 刪掉上次的結果建新的資料夾，要不然比如上次 fake_amount=100， 這次 fake_amount=10， 仍會是100的結果
+            if(sep_dir): Check_dir_exist_and_build_new_dir(fake_dst_dir + "/" + str(dir_name))    ### 刪掉上次的結果建新的資料夾，要不然比如上次 fake_amount=100， 這次 fake_amount=10， 仍會是100的結果
+            else       : Check_dir_exist_and_build        (fake_dst_dir )                         ### 刪掉上次的結果建新的資料夾，要不然比如上次 fake_amount=100， 這次 fake_amount=10， 仍會是100的結果
             for index in range(dir_lower_b, dir_lower_u):
                 # print("dir_key:", dir_key)
                 ord_data_path = ord_paths[index]                                            ### 取出   ord_data_path
-                dst_data_path = fake_dst_dir + "/" + self.page_names[index] + extend_name   ### 定位出 dst_data_path
+                ### 定位出 dst_data_path
+                if(sep_dir): dst_data_path = fake_dst_dir + "/" + self.page_names[index] + extend_name
+                else       : dst_data_path = fake_dst_dir + "/" + "%02i-%s" % (int(self.page_names[index].split("/")[0]), self.page_names[index].split("/")[1]) + extend_name
                 shutil.copy(ord_data_path, dst_data_path)                                   ### 複製過去囉！
                 if(print_msg): print(dir_key, "ord_data_path:", ord_data_path, "copy to")
                 if(print_msg): print(dir_key, "dst_data_path:", dst_data_path, "finish")
 
-    def make_fake_img_db(self, dst_dir, build_dir_fake_amount=1, print_msg=False):
-        self._make_fake_some_db(dir_key="img", dst_dir=dst_dir, build_dir_fake_amount=build_dir_fake_amount, print_msg=print_msg)
+    def make_fake_img_db(self, dst_dir, build_dir_fake_amount=1, sep_dir=True, print_msg=False):
+        self._make_fake_some_db(dir_key="img", dst_dir=dst_dir, build_dir_fake_amount=build_dir_fake_amount, sep_dir=sep_dir, print_msg=print_msg)
 
-    def make_fake_wc_db(self, dst_dir, build_dir_fake_amount=1, print_msg=False):
-        self._make_fake_some_db(dir_key="wc", dst_dir=dst_dir, build_dir_fake_amount=build_dir_fake_amount, print_msg=print_msg)
+    def make_fake_wc_db(self, dst_dir, build_dir_fake_amount=1, sep_dir=True, print_msg=False):
+        self._make_fake_some_db(dir_key="wc", dst_dir=dst_dir, build_dir_fake_amount=build_dir_fake_amount, sep_dir=sep_dir, print_msg=print_msg)
 
-    def make_fake_uv_db(self, dst_dir, build_dir_fake_amount=1, print_msg=False):
-        self._make_fake_some_db(dir_key="uv", dst_dir=dst_dir, build_dir_fake_amount=build_dir_fake_amount, print_msg=print_msg)
+    def make_fake_uv_db(self, dst_dir, build_dir_fake_amount=1, sep_dir=True, print_msg=False):
+        self._make_fake_some_db(dir_key="uv", dst_dir=dst_dir, build_dir_fake_amount=build_dir_fake_amount, sep_dir=sep_dir, print_msg=print_msg)
 
 
-    def make_fake_db(self, dst_dir, build_dir_fake_amount=1, print_msg=False):
-        self.make_fake_img_db(dst_dir=dst_dir, build_dir_fake_amount=build_dir_fake_amount, print_msg=False)
-        self.make_fake_wc_db(dst_dir=dst_dir, build_dir_fake_amount=build_dir_fake_amount, print_msg=False)
-        self.make_fake_uv_db(dst_dir=dst_dir, build_dir_fake_amount=build_dir_fake_amount, print_msg=False)
+    def make_fake_db(self, dst_dir, build_dir_fake_amount=1, sep_dir=True, print_msg=False):
+        self.make_fake_img_db(dst_dir=dst_dir, build_dir_fake_amount=build_dir_fake_amount, sep_dir=sep_dir, print_msg=False)
+        self.make_fake_wc_db (dst_dir=dst_dir, build_dir_fake_amount=build_dir_fake_amount, sep_dir=sep_dir, print_msg=False)
+        self.make_fake_uv_db (dst_dir=dst_dir, build_dir_fake_amount=build_dir_fake_amount, sep_dir=sep_dir, print_msg=False)
 
 class Fake_Doc3D(Doc3D):
     def __init__(self, root):
@@ -159,7 +159,14 @@ class Fake_Doc3D(Doc3D):
 
 ### 127.35
 real_doc3D = Real_Doc3D(root="K:/swat3D")
-fake_doc3D_path = "C:/Users/TKU/Desktop/fake_doc3D"
+
+### 127.23 2022/04/11
+real_doc3D = Real_Doc3D(root="J:/swat3D")
 
 if(__name__ == "__main__"):
-    real_doc3D.make_fake_db(dst_dir=fake_doc3D_path, build_dir_fake_amount=20)
+    # fake_doc3D_path = "C:/Users/TKU/Desktop/fake_doc3D"  ### 127.35 忘記什麼時候了
+    fake_doc3D_path = "L:/Doc3D_50"  ### 127.23 2022/04/11
+    fake_doc3D_merge_path = "L:/Doc3D_50_merge"  ### 127.23 2022/04/11
+
+    real_doc3D.make_fake_db(dst_dir=fake_doc3D_path,       build_dir_fake_amount=50)
+    real_doc3D.make_fake_db(dst_dir=fake_doc3D_merge_path, build_dir_fake_amount=50, sep_dir=False)
