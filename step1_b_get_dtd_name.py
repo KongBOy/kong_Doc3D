@@ -1,5 +1,8 @@
+'''
+augtexnames.txt 這應該是給 DewarpNet 用的喔～
+'''
 import os
-from step0_get_page_name import doc3D
+from step0_Doc3D_obj import doc3D
 
 aug_path = doc3D.db_root[: len(doc3D.db_root.split("/")[-1]) * -1 - 1] + "/" + "augtexnames.txt"
 if os.path.isfile(aug_path): os.remove(aug_path)
