@@ -12,16 +12,16 @@ class Doc3D_train_val_txt:
         if os.path.isfile(train_txt_path): os.remove(train_txt_path)
         if os.path.isfile(val_txt_path)  : os.remove(val_txt_path)
 
-        train_num = int(train_split * len(doc3D.page_names))
+        train_num = int(train_split * len(doc3D.page_names_w_dir))
         with open(train_txt_path, "a") as f:
-            for page_name in doc3D.page_names[:train_num]:
-                # print(page_name)
-                f.write(page_name + "\n")
+            for page_name_w_dir in doc3D.page_names_w_dir[:train_num]:
+                # print(page_name_w_dir)
+                f.write(page_name_w_dir + "\n")
 
         with open(val_txt_path, "a") as f:
-            for page_name in doc3D.page_names[train_num:]:
-                # print(page_name)
-                f.write(page_name + "\n")
+            for page_name_w_dir in doc3D.page_names_w_dir[train_num:]:
+                # print(page_name_w_dir)
+                f.write(page_name_w_dir + "\n")
 
 
 if __name__ == "__main__":
