@@ -35,6 +35,7 @@ class Doc3D:
         self._page_names_w_dir = None
         self._page_names_w_dir_combine = None
         self._img_paths  = None
+        self._alb_paths  = None
         self._wc_paths   = None
         self._uv_paths   = None
         # self.get_doc3d_kinds_of_paths()   ### 不要在這邊直接呼叫，我下面會建立 real_doc3D物件， 在這邊呼叫就代表一定要插 2T Doc3D 硬碟 才能跑！
@@ -61,6 +62,11 @@ class Doc3D:
         return self._img_paths
 
     @property
+    def alb_paths(self):
+        if(self._alb_paths is None): self.get_doc3d_kinds_of_paths()
+        return self._alb_paths
+
+    @property
     def wc_paths(self):
         if(self._wc_paths is None): self.get_doc3d_kinds_of_paths()
         return self._wc_paths
@@ -76,6 +82,7 @@ class Doc3D:
         self._page_names_w_dir_combine = []
         self._page_names = []
         self._img_paths  = []
+        self._alb_paths  = []
         self._wc_paths   = []
         self._uv_paths   = []
         doc3d_dir_names = [self.db_root + "/img/%i" % i for i in range(1, 22)]  ### ["F:/swat3D/1", "F:/swat3D/2", ..., "F:/swat3D/21"]
@@ -88,6 +95,7 @@ class Doc3D:
                 self._page_names_w_dir_combine.append( "%02i--%s" % (int(page_name_w_dir.split("/")[0] ), page_name_w_dir.split("/")[1]) )  ### [21-1000_1-cp_Page_0179-r8T0001, 21-105_3-ny_Page_850-02a0001, ... ]
                 self._page_names              .append( page_name_w_dir.split("/")[1] )  ### [1000_1-cp_Page_0179-r8T0001, 105_3-ny_Page_850-02a0001, ... ]
                 self._img_paths .append(self.db_root + "/img/" + page_name_w_dir + ".png" )
+                self._alb_paths .append(self.db_root + "/alb/" + page_name_w_dir + ".png" )
                 self._wc_paths  .append(self.db_root + "/wc/"  + page_name_w_dir + ".exr" )
                 self._uv_paths  .append(self.db_root + "/uv/"  + page_name_w_dir + ".exr" )
             names.sort(key=lambda name: ("%04i" % int(name.split("_")[0]) + "%04i" % int(name.split("_")[1].split("-")[0]) + name.split("_")[2].split("-")[0]))  ### 這一步只是想把 list 內容物 的順序 弄得很像 windows 資料夾內的 排序方式比較好找資料，省略也沒關係喔！
