@@ -164,21 +164,21 @@ if(__name__ == "__main__"):
     ### 做事1
     ### 101838
     ### 102064
-    SSD_dst_dir = "F:/kong_doc3d"
-    HDD_dst_dir = "K:\kong_doc3d"
+    SSD_dst_dir = "F:/kong_doc3d/train"
+    HDD_dst_dir = "K:/kong_doc3d/train"
     Check_dir_exist_and_build(HDD_dst_dir)  ### 一定要先建立 HDD_dst_dir， 要不然LOG檔沒地方存會報錯
     for dir_num in range(21):
         if( dir_num < 15 ): continue
         just_do_what_dir_num = dir_num + 1
 
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir="F:/kong_doc3d", job_id=1, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir="F:/kong_doc3d", job_id=3, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir="F:/kong_doc3d", job_id=4, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir="F:/kong_doc3d", job_id=7, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir="F:/kong_doc3d", job_id=8, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir="F:/kong_doc3d", job_id=2, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir="F:/kong_doc3d", job_id=5, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir="F:/kong_doc3d", job_id=6, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=1, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=3, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=4, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=7, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=8, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=2, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=5, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=6, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
 
         os.system(f"robocopy {SSD_dst_dir}/1_uv-1_npy             {HDD_dst_dir}/1_uv-1_npy             /MOVE /E /MT:100 /LOG:{HDD_dst_dir}/robocopy-%02i-1_uv-1_npy.txt"             % (just_do_what_dir_num))
         os.system(f"robocopy {SSD_dst_dir}/1_uv-2_visual          {HDD_dst_dir}/1_uv-2_visual          /MOVE /E /MT:100 /LOG:{HDD_dst_dir}/robocopy-%02i-1_uv-2_visual.txt"          % (just_do_what_dir_num))
