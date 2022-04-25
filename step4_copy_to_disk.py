@@ -40,8 +40,8 @@ if(__name__ == "__main__"):
     # os.system(f"robocopy {src_dir}/2_wc-4_W_w_M_npy   {dst_dir}/2_wc-4_W_w_M_npy   /E /MT:100 /LOG:{dst_dir}/robocopy-2_wc-4_W_w_M_npy.txt" )
     # os.system(f"robocopy {src_dir}/2_wc-5_W_w_M_knpy  {dst_dir}/2_wc-5_W_w_M_knpy  /E /MT:100 /LOG:{dst_dir}/robocopy-2_wc-5_W_w_M_knpy.txt")
 
-    # os.system(f"robocopy {src_dir}/0_dis_img          {dst_dir}/0_dis_img          /E /MT:100 /UNILOG:{src_log_dir}/robocopy-0_dis_img.txt"        )
-    # os.system(f"robocopy {src_dir}/0_rec_hope         {dst_dir}/0_rec_hope         /E /MT:100 /UNILOG:{src_log_dir}/robocopy-0_rec_hope.txt"       )
+    os.system(f"robocopy {src_dir}/0_dis_img          {dst_dir}/0_dis_img          /E /MT:100 /UNILOG:{src_log_dir}/robocopy-0_dis_img.txt"        )
+    os.system(f"robocopy {src_dir}/0_rec_hope         {dst_dir}/0_rec_hope         /E /MT:100 /UNILOG:{src_log_dir}/robocopy-0_rec_hope.txt"       )
     os.system(f"robocopy {src_dir}/1_uv-3_knpy        {dst_dir}/1_uv-3_knpy        /E /MT:100 /UNILOG:{src_log_dir}/robocopy-1_uv-3_knpy.txt"      )
     os.system(f"robocopy {src_dir}/2_wc-5_W_w_M_knpy  {dst_dir}/2_wc-5_W_w_M_knpy  /E /MT:100 /UNILOG:{src_log_dir}/robocopy-2_wc-5_W_w_M_knpy.txt")
     os.system(f"robocopy {src_dir}/2_wc-1_npy         {dst_dir}/2_wc-1_npy         /E /MT:100 /UNILOG:{src_log_dir}/robocopy-2_wc-1_npy.txt"       )
