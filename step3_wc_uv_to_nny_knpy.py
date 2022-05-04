@@ -27,8 +27,11 @@ import os
 import time
 import matplotlib.pyplot as plt
 
+def build_sep_dir(dir_path):
+    for i in range(21):
+        Check_dir_exist_and_build(f"{dir_path}/%02i" % (i + 1))
 ############################################################################################################################################
-def wc_uv_2_npy_knpy(doc3d, dst_dir, job_id=1, just_do_what_dir_num=None, core_amount=3):
+def wc_uv_2_npy_knpy(doc3d, dst_dir, use_sep_name=False, job_id=1, just_do_what_dir_num=None, core_amount=3):
     start_time = time.time()
     ### 定位出dir
     uv_dst_dir  = dst_dir + "/" + "1_uv"
@@ -54,6 +57,16 @@ def wc_uv_2_npy_knpy(doc3d, dst_dir, job_id=1, just_do_what_dir_num=None, core_a
     elif(job_id == 7): Check_dir_exist_and_build(W_w_M_npy_dir)
     elif(job_id == 8): Check_dir_exist_and_build(W_w_M_knpy_dir)
 
+    if  (job_id == 1 and use_sep_name is True): build_sep_dir(uv_npy_dir)
+    elif(job_id == 2 and use_sep_name is True): build_sep_dir(uv_vis_dir)
+    elif(job_id == 3 and use_sep_name is True): build_sep_dir(uv_knpy_dir)
+
+    elif(job_id == 4 and use_sep_name is True): build_sep_dir(wc_npy_dir)
+    elif(job_id == 5 and use_sep_name is True): build_sep_dir(wc_vis_2d_dir)
+    elif(job_id == 6 and use_sep_name is True): build_sep_dir(wc_vis_3d_dir)
+    elif(job_id == 7 and use_sep_name is True): build_sep_dir(W_w_M_npy_dir)
+    elif(job_id == 8 and use_sep_name is True): build_sep_dir(W_w_M_knpy_dir)
+
     dst_dict = {
         "uv_npy_dir"     : uv_npy_dir,
         "uv_vis_dir"     : uv_vis_dir,
@@ -75,7 +88,7 @@ def wc_uv_2_npy_knpy(doc3d, dst_dir, job_id=1, just_do_what_dir_num=None, core_a
         if(just_do_what_dir_num == 1): task_start_index = 0
 
 
-    _wc_uv_2_npy_knpy_multiprocess(doc3d, dst_dict, core_amount=core_amount, job_id=job_id, task_amount=task_amount, task_start_index=task_start_index)
+    _wc_uv_2_npy_knpy_multiprocess(doc3d, dst_dict, use_sep_name=use_sep_name, job_id=job_id, core_amount=core_amount, task_amount=task_amount, task_start_index=task_start_index)
 
     if  (job_id == 1): Save_as_jpg(uv_npy_dir     , uv_npy_dir     , delete_ord_file=True)
     elif(job_id == 2): Save_as_jpg(uv_vis_dir     , uv_vis_dir     , delete_ord_file=True)
@@ -87,35 +100,57 @@ def wc_uv_2_npy_knpy(doc3d, dst_dir, job_id=1, just_do_what_dir_num=None, core_a
     elif(job_id == 8): Save_as_jpg(W_w_M_knpy_dir , W_w_M_knpy_dir , delete_ord_file=True)
     print("total_cost_time:", time.time() - start_time)
 
-def _wc_uv_2_npy_knpy_multiprocess(doc3d, dst_dict, job_id, core_amount, task_amount, task_start_index):
-    multi_processing_interface(core_amount=core_amount, task_amount=task_amount, task=_wc_uv_2_npy_knpy, task_start_index=task_start_index, task_args=[doc3d, dst_dict, job_id], print_msg=True)
+def _wc_uv_2_npy_knpy_multiprocess(doc3d, dst_dict, use_sep_name, job_id, core_amount, task_amount, task_start_index):
+    multi_processing_interface(core_amount=core_amount, task_amount=task_amount, task=_wc_uv_2_npy_knpy, task_start_index=task_start_index, task_args=[doc3d, dst_dict, use_sep_name, job_id], print_msg=False)
 
-def _wc_uv_2_npy_knpy(start_index, amount, doc3d, dst_dict, job_id):
+def _wc_uv_2_npy_knpy(start_index, amount, doc3d, dst_dict, use_sep_name, job_id):
     for i in tqdm(range(start_index, start_index + amount)):
         # print(i, file_path)
+        if(use_sep_name is False): use_what_name = doc3d.page_names_w_dir_combine[i]
+        else                     : use_what_name = doc3d.page_names_w_dir_combine_sep[i]
         ####### 定位出path
-        uv_npy_path  = dst_dict["uv_npy_dir"]        + "/" + doc3d.page_names_w_dir_combine[i] + ".npy"
-        uv_vis_path  = dst_dict["uv_vis_dir"]        + "/" + doc3d.page_names_w_dir_combine[i] + ".png"
-        uv_knpy_path = dst_dict["uv_knpy_dir"]       + "/" + doc3d.page_names_w_dir_combine[i] + ".knpy"
+        uv_npy_path  = dst_dict["uv_npy_dir"]        + "/" + use_what_name + ".npy"
+        uv_vis_path  = dst_dict["uv_vis_dir"]        + "/" + use_what_name + ".png"
+        uv_knpy_path = dst_dict["uv_knpy_dir"]       + "/" + use_what_name + ".knpy"
 
-        wc_npy_path     = dst_dict["wc_npy_dir"]     + "/" + doc3d.page_names_w_dir_combine[i] + ".npy"
-        wc_vis_2d_path  = dst_dict["wc_vis_2d_dir"]  + "/" + doc3d.page_names_w_dir_combine[i] + ".png"
-        wc_vis_3d_path  = dst_dict["wc_vis_3d_dir"]  + "/" + doc3d.page_names_w_dir_combine[i] + ".png"
-        W_w_M_npy_path  = dst_dict["W_w_M_npy_dir"]  + "/" + doc3d.page_names_w_dir_combine[i] + ".npy"
-        W_w_M_knpy_path = dst_dict["W_w_M_knpy_dir"] + "/" + doc3d.page_names_w_dir_combine[i] + ".knpy"
+        wc_npy_path     = dst_dict["wc_npy_dir"]     + "/" + use_what_name + ".npy"
+        wc_vis_2d_path  = dst_dict["wc_vis_2d_dir"]  + "/" + use_what_name + ".png"
+        wc_vis_3d_path  = dst_dict["wc_vis_3d_dir"]  + "/" + use_what_name + ".png"
+        W_w_M_npy_path  = dst_dict["W_w_M_npy_dir"]  + "/" + use_what_name + ".npy"
+        W_w_M_knpy_path = dst_dict["W_w_M_knpy_dir"] + "/" + use_what_name + ".knpy"
 
         ####### 做事情的地方
         uv              = get_exr(doc3d.uv_paths[i])
         mask            = uv[..., 0]
-        wc              = get_exr(doc3d.wc_paths[i])
-        wc_3D_good_to_v = wc             [..., 0:3]   ### 嘗試幾次後，這樣子比較好看
-        wc_3D_good_to_v = wc_3D_good_to_v[..., ::-1]  ### 嘗試幾次後，這樣子比較好看
-        W_w_M           = wc.copy()
-        W_w_M[..., 3]   = mask
 
-        uv              = uv   .astype(np.float32)
-        wc              = wc   .astype(np.float32)
-        W_w_M           = W_w_M.astype(np.float32)
+        wc_zxy             = get_exr(doc3d.wc_paths[i])  ### z, x, y, ?
+        Wzxy_w_M           = wc_zxy.copy()
+        Wzxy_w_M[..., 3]   = mask
+
+        ### x, y 對調
+        Wx = Wzxy_w_M[..., 1:2].copy()
+        Wy = Wzxy_w_M[..., 2:3].copy()
+        Wzyx_w_M = Wzxy_w_M.copy()
+        Wzyx_w_M[..., 1:2] = Wy
+        Wzyx_w_M[..., 2:3] = Wx
+        Wzyx = Wzyx_w_M[..., :3]
+
+        Wzyx_3D_good_to_v = Wzyx[..., ::-1]  ### 嘗試幾次後，這樣子比較好看
+
+        ### 用這個真的確認： doc3D 他們的 W 是 z, x, y ！ 我的是 z, y, x
+        # fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(5 * 2, 5))
+        # ax[0, 0].imshow(Wzxy_w_M[..., 0:1])
+        # ax[0, 1].imshow(Wzxy_w_M[..., 1:2])
+        # ax[0, 2].imshow(Wzxy_w_M[..., 2:3])
+        # ax[1, 0].imshow(Wzyx_w_M[..., 0:1])
+        # ax[1, 1].imshow(Wzyx_w_M[..., 1:2])
+        # ax[1, 2].imshow(Wzyx_w_M[..., 2:3])
+        # plt.show()
+
+        ### 轉 dtype
+        uv       = uv       .astype(np.float32)
+        Wzyx     = Wzyx     .astype(np.float32)
+        Wzyx_w_M = Wzyx_w_M .astype(np.float32)
 
         ####### 存到相對應的位置
         ##### uv part
@@ -136,23 +171,23 @@ def _wc_uv_2_npy_knpy(start_index, amount, doc3d, dst_dict, job_id):
         elif(job_id == 4):
             ##### wc part
             ### wc-1_npy
-            np.save(wc_npy_path, wc)
+            np.save(wc_npy_path, Wzyx)
 
         elif(job_id == 5):
             ### wc-2_2D_visual
-            fig, ax = wc_2d_plot(wc, figsize=(5, 5))
+            fig, ax = wc_2d_plot(Wzyx, figsize=(5, 5))
             plt.savefig(wc_vis_2d_path)
             plt.close()
 
         elif(job_id == 6):
             ### wc-3_3D_visual
-            fig, ax = wc_3d_plot(wc_3D_good_to_v, mask, fewer_point=True, small_size=(300, 300), figsize=(5, 5))
+            fig, ax = wc_3d_plot(Wzyx_3D_good_to_v, mask, fewer_point=True, small_size=(300, 300), figsize=(5, 5))
             plt.savefig(wc_vis_3d_path)
             plt.close()
 
         elif(job_id == 7):
             ### wc-4_W_w_M_npy
-            np.save(W_w_M_npy_path, W_w_M)
+            np.save(W_w_M_npy_path, Wzyx_w_M)
 
         elif(job_id == 8):
             ### wc-5_W_w_M_knpy
@@ -165,29 +200,37 @@ if(__name__ == "__main__"):
     ### 101838
     ### 102064
     SSD_dst_dir = "F:/kong_doc3d/train"
-    HDD_dst_dir = "K:/kong_doc3d/train"
-    Check_dir_exist_and_build(HDD_dst_dir)  ### 一定要先建立 HDD_dst_dir， 要不然LOG檔沒地方存會報錯
+    HDD_dst_dir = "I:/kong_doc3d/train"
+    use_sep_name = True
+
+    import datetime
+    current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    src_log_dir = f"{SSD_dst_dir}/LOG-{current_time}"
+    dst_log_dir = f"{HDD_dst_dir}/LOG-{current_time}"
+    Check_dir_exist_and_build(src_log_dir)  ### 一定要先建立 HDD_dst_dir， 要不然LOG檔沒地方存會報錯
+
     for dir_num in range(21):
-        if( dir_num < 15 ): continue
+        if( dir_num < 21 - 1): continue
         just_do_what_dir_num = dir_num + 1
 
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=1, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=3, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=4, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=7, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=8, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=2, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=5, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
-        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, job_id=6, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, use_sep_name=use_sep_name, job_id=1, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, use_sep_name=use_sep_name, job_id=3, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, use_sep_name=use_sep_name, job_id=7, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, use_sep_name=use_sep_name, job_id=8, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, use_sep_name=use_sep_name, job_id=4, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, use_sep_name=use_sep_name, job_id=2, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, use_sep_name=use_sep_name, job_id=5, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
+        wc_uv_2_npy_knpy(using_doc3D, dst_dir=SSD_dst_dir, use_sep_name=use_sep_name, job_id=6, just_do_what_dir_num=just_do_what_dir_num, core_amount=25)
 
-        os.system(f"robocopy {SSD_dst_dir}/1_uv-1_npy             {HDD_dst_dir}/1_uv-1_npy             /MOVE /E /MT:100 /LOG:{HDD_dst_dir}/robocopy-%02i-1_uv-1_npy.txt"             % (just_do_what_dir_num))
-        os.system(f"robocopy {SSD_dst_dir}/1_uv-2_visual          {HDD_dst_dir}/1_uv-2_visual          /MOVE /E /MT:100 /LOG:{HDD_dst_dir}/robocopy-%02i-1_uv-2_visual.txt"          % (just_do_what_dir_num))
-        os.system(f"robocopy {SSD_dst_dir}/1_uv-3_knpy            {HDD_dst_dir}/1_uv-3_knpy            /MOVE /E /MT:100 /LOG:{HDD_dst_dir}/robocopy-%02i-1_uv-3_knpy.txt"            % (just_do_what_dir_num))
-        os.system(f"robocopy {SSD_dst_dir}/2_wc-1_npy             {HDD_dst_dir}/2_wc-1_npy             /MOVE /E /MT:100 /LOG:{HDD_dst_dir}/robocopy-%02i-2_wc-1_npy.txt"             % (just_do_what_dir_num))
-        os.system(f"robocopy {SSD_dst_dir}/2_wc-2_2D_visual       {HDD_dst_dir}/2_wc-2_2D_visual       /MOVE /E /MT:100 /LOG:{HDD_dst_dir}/robocopy-%02i-2_wc-2_2D_visual.txt"       % (just_do_what_dir_num))
-        os.system(f"robocopy {SSD_dst_dir}/2_wc-3_3D_visual       {HDD_dst_dir}/2_wc-3_3D_visual       /MOVE /E /MT:100 /LOG:{HDD_dst_dir}/robocopy-%02i-2_wc-3_3D_visual.txt"       % (just_do_what_dir_num))
-        os.system(f"robocopy {SSD_dst_dir}/2_wc-4_W_w_M_npy       {HDD_dst_dir}/2_wc-4_W_w_M_npy       /MOVE /E /MT:100 /LOG:{HDD_dst_dir}/robocopy-%02i-2_wc-4_W_w_M_npy.txt"       % (just_do_what_dir_num))
-        os.system(f"robocopy {SSD_dst_dir}/2_wc-5_W_w_M_knpy      {HDD_dst_dir}/2_wc-5_W_w_M_knpy      /MOVE /E /MT:100 /LOG:{HDD_dst_dir}/robocopy-%02i-2_wc-5_W_w_M_knpy.txt"      % (just_do_what_dir_num))
+        os.system(f"robocopy {SSD_dst_dir}/1_uv-1_npy             {HDD_dst_dir}/1_uv-1_npy             /MOVE /E /MT:100 /LOG:{src_log_dir}/robocopy-%02i-1_uv-1_npy.txt"             % (just_do_what_dir_num))
+        os.system(f"robocopy {SSD_dst_dir}/1_uv-2_visual          {HDD_dst_dir}/1_uv-2_visual          /MOVE /E /MT:100 /LOG:{src_log_dir}/robocopy-%02i-1_uv-2_visual.txt"          % (just_do_what_dir_num))
+        os.system(f"robocopy {SSD_dst_dir}/1_uv-3_knpy            {HDD_dst_dir}/1_uv-3_knpy            /MOVE /E /MT:100 /LOG:{src_log_dir}/robocopy-%02i-1_uv-3_knpy.txt"            % (just_do_what_dir_num))
+        os.system(f"robocopy {SSD_dst_dir}/2_wc-1_npy             {HDD_dst_dir}/2_wc-1_npy             /MOVE /E /MT:100 /LOG:{src_log_dir}/robocopy-%02i-2_wc-1_npy.txt"             % (just_do_what_dir_num))
+        os.system(f"robocopy {SSD_dst_dir}/2_wc-2_2D_visual       {HDD_dst_dir}/2_wc-2_2D_visual       /MOVE /E /MT:100 /LOG:{src_log_dir}/robocopy-%02i-2_wc-2_2D_visual.txt"       % (just_do_what_dir_num))
+        os.system(f"robocopy {SSD_dst_dir}/2_wc-3_3D_visual       {HDD_dst_dir}/2_wc-3_3D_visual       /MOVE /E /MT:100 /LOG:{src_log_dir}/robocopy-%02i-2_wc-3_3D_visual.txt"       % (just_do_what_dir_num))
+        os.system(f"robocopy {SSD_dst_dir}/2_wc-4_W_w_M_npy       {HDD_dst_dir}/2_wc-4_W_w_M_npy       /MOVE /E /MT:100 /LOG:{src_log_dir}/robocopy-%02i-2_wc-4_W_w_M_npy.txt"       % (just_do_what_dir_num))
+        os.system(f"robocopy {SSD_dst_dir}/2_wc-5_W_w_M_knpy      {HDD_dst_dir}/2_wc-5_W_w_M_knpy      /MOVE /E /MT:100 /LOG:{src_log_dir}/robocopy-%02i-2_wc-5_W_w_M_knpy.txt"      % (just_do_what_dir_num))
+        os.system(f"robocopy {src_log_dir} {dst_log_dir} /E")
 
         '''
         robocopy F:/kong_doc3d/1_uv-1_npy             K:\kong_doc3d/1_uv-1_npy            /MOVE /E /MT:100 /LOG:K:\kong_doc3d/robocopy-2-1_uv-1_npy.txt"

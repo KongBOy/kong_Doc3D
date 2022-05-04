@@ -28,8 +28,11 @@ import time
 import matplotlib.pyplot as plt
 import shutil
 
+def build_sep_dir(dir_path):
+    for i in range(21):
+        Check_dir_exist_and_build(f"{dir_path}/%02i" % (i + 1))
 ############################################################################################################################################
-def dis_img_and_rec_hope(doc3d, dst_dir, job_id=1, just_do_what_dir_num=None, core_amount=3):
+def dis_img_and_rec_hope(doc3d, dst_dir, use_sep_name=False, job_id=1, just_do_what_dir_num=None, core_amount=3):
     start_time = time.time()
     dis_img_dir  = dst_dir + "/" + "0_dis_img"
     rec_hope_dir = dst_dir + "/" + "0_rec_hope"
@@ -37,6 +40,9 @@ def dis_img_and_rec_hope(doc3d, dst_dir, job_id=1, just_do_what_dir_num=None, co
     ### 因為檔案太多容易失敗， 所以就不要build_new_dir囉！
     if  (job_id == 1): Check_dir_exist_and_build(dis_img_dir)
     elif(job_id == 2): Check_dir_exist_and_build(rec_hope_dir)
+
+    if(job_id == 1 and use_sep_name is True): build_sep_dir(dis_img_dir)
+    if(job_id == 2 and use_sep_name is True): build_sep_dir(rec_hope_dir)
 
     dst_dict = {
         "dis_img_dir"  : dis_img_dir,
@@ -53,19 +59,23 @@ def dis_img_and_rec_hope(doc3d, dst_dir, job_id=1, just_do_what_dir_num=None, co
         if(just_do_what_dir_num == 1): task_start_index = 0                         ### 如果你指定第 1 個資料夾， 會變成 doc3d.dir_data_amounts_acc [-1] 就取錯了喔！ 起始位置為 0才對， 手動設定0這樣子
 
 
-    _dis_img_and_rec_hope_multiprocess(doc3d, dst_dict, core_amount=core_amount, job_id=job_id, task_amount=task_amount, task_start_index=task_start_index)
+    _dis_img_and_rec_hope_multiprocess(doc3d, dst_dict, use_sep_name=use_sep_name, job_id=job_id, core_amount=core_amount, task_amount=task_amount, task_start_index=task_start_index)
 
     print("total_cost_time:", time.time() - start_time)
 
-def _dis_img_and_rec_hope_multiprocess(doc3d, dst_dict, job_id, core_amount, task_amount, task_start_index):
-    multi_processing_interface(core_amount=core_amount, task_amount=task_amount, task=_dis_img_and_rec_hope, task_start_index=task_start_index, task_args=[doc3d, dst_dict, job_id], print_msg=True)
+def _dis_img_and_rec_hope_multiprocess(doc3d, dst_dict, use_sep_name, job_id, core_amount, task_amount, task_start_index):
+    multi_processing_interface(core_amount=core_amount, task_amount=task_amount, task=_dis_img_and_rec_hope, task_start_index=task_start_index, task_args=[doc3d, dst_dict, use_sep_name, job_id], print_msg=False)
 
-def _dis_img_and_rec_hope(start_index, amount, doc3d, dst_dict, job_id):
+def _dis_img_and_rec_hope(start_index, amount, doc3d, dst_dict, use_sep_name, job_id):
     for i in tqdm(range(start_index, start_index + amount)):
         # print(i, file_path)
         ####### 定位出path
-        dis_img_path  = dst_dict["dis_img_dir"]        + "/" + doc3d.page_names_w_dir_combine[i] + ".png"
-        rec_hope_path = dst_dict["rec_hope_dir"]       + "/" + doc3d.page_names_w_dir_combine[i] + ".png"
+        if(use_sep_name is False): use_what_name = doc3d.page_names_w_dir_combine[i]
+        else                     : use_what_name = doc3d.page_names_w_dir_combine_sep[i]
+
+        dis_img_path  = dst_dict["dis_img_dir"]  + "/" + use_what_name + ".png"
+        rec_hope_path = dst_dict["rec_hope_dir"] + "/" + use_what_name + ".png"
+
 
         ####### 做事情的地方
         if  (job_id == 1):
@@ -85,16 +95,23 @@ if(__name__ == "__main__"):
     ### 101838
     ### 102064
     SSD_dst_dir = "F:/kong_doc3d/train"
-    HDD_dst_dir = "K:/kong_doc3d/train"
-    Check_dir_exist_and_build(HDD_dst_dir)  ### 一定要先建立 HDD_dst_dir， 要不然LOG檔沒地方存會報錯
+    HDD_dst_dir = "I:/kong_doc3d/train"
+    import datetime
+    current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    src_log_dir = f"{SSD_dst_dir}/LOG-{current_time}"
+    dst_log_dir = f"{HDD_dst_dir}/LOG-{current_time}"
+    use_sep_name = True
+
+    Check_dir_exist_and_build(src_log_dir)  ### 一定要先建立 src_log_dir 要不然LOG檔沒地方存會報錯
     for dir_num in range(21):
         just_do_what_dir_num = dir_num + 1
 
-        dis_img_and_rec_hope(using_doc3D, dst_dir=SSD_dst_dir, job_id=1, just_do_what_dir_num=just_do_what_dir_num, core_amount=2)
-        dis_img_and_rec_hope(using_doc3D, dst_dir=SSD_dst_dir, job_id=2, just_do_what_dir_num=just_do_what_dir_num, core_amount=10)
+        dis_img_and_rec_hope(using_doc3D, dst_dir=SSD_dst_dir, use_sep_name=use_sep_name, job_id=1, just_do_what_dir_num=just_do_what_dir_num, core_amount=2)
+        dis_img_and_rec_hope(using_doc3D, dst_dir=SSD_dst_dir, use_sep_name=use_sep_name, job_id=2, just_do_what_dir_num=just_do_what_dir_num, core_amount=10)
 
-        os.system(f"robocopy {SSD_dst_dir}/0_dis_img  {HDD_dst_dir}/0_dis_img   /MOVE /E /MT:100 /LOG:{HDD_dst_dir}/robocopy-%02i-0_dis_img.txt"   % (just_do_what_dir_num))
-        os.system(f"robocopy {SSD_dst_dir}/0_rec_hope {HDD_dst_dir}/0_rec_hope  /MOVE /E /MT:100 /LOG:{HDD_dst_dir}/robocopy-%02i-0_rec_hope.txt"  % (just_do_what_dir_num))
+        os.system(f"robocopy {SSD_dst_dir}/0_dis_img  {HDD_dst_dir}/0_dis_img   /MOVE /E /MT:100 /LOG:{src_log_dir}/robocopy-%02i-0_dis_img.txt"   % (just_do_what_dir_num))
+        os.system(f"robocopy {SSD_dst_dir}/0_rec_hope {HDD_dst_dir}/0_rec_hope  /MOVE /E /MT:100 /LOG:{src_log_dir}/robocopy-%02i-0_rec_hope.txt"  % (just_do_what_dir_num))
+        os.system(f"robocopy {src_log_dir} {dst_log_dir} /E")
 
         '''
         robocopy F:/kong_doc3d/1_uv-1_npy             K:\kong_doc3d/1_uv-1_npy            /MOVE /E /MT:100 /LOG:K:\kong_doc3d/robocopy-2-1_uv-1_npy.txt"
