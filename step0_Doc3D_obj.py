@@ -34,6 +34,7 @@ class Doc3D:
         self._page_names = None
         self._page_names_w_dir = None
         self._page_names_w_dir_combine = None
+        self._page_names_w_dir_combine_sep = None
         self._img_paths  = None
         self._alb_paths  = None
         self._wc_paths   = None
@@ -50,6 +51,11 @@ class Doc3D:
     def page_names_w_dir_combine(self):
         if(self._page_names_w_dir_combine is None): self.get_doc3d_kinds_of_paths()
         return self._page_names_w_dir_combine
+
+    @property
+    def page_names_w_dir_combine_sep(self):
+        if(self._page_names_w_dir_combine_sep is None): self.get_doc3d_kinds_of_paths()
+        return self._page_names_w_dir_combine_sep
 
     @property
     def page_names(self):
@@ -80,6 +86,7 @@ class Doc3D:
         print("get_doc3d_kinds_of_paths( here~~~~~ should just be used only once!應該只會被用到一次")
         self._page_names_w_dir = []
         self._page_names_w_dir_combine = []
+        self._page_names_w_dir_combine_sep = []
         self._page_names = []
         self._img_paths  = []
         self._alb_paths  = []
@@ -91,9 +98,7 @@ class Doc3D:
             names = os.listdir(name_dir)  ### [1000_1-cp_Page_0179-r8T0001.png, 105_3-ny_Page_850-02a0001.png, ... ]
             for name in names:
                 page_name_w_dir = str(dir_id) + "/" + name[: -4]  ### 去掉副檔名 和 加上 dir_id，比如 21/1000_1-cp_Page_0179-r8T0001 就是一個 page_name_w_dir
-                self._page_names_w_dir        .append( page_name_w_dir)          ### [21/1000_1-cp_Page_0179-r8T0001, 21/105_3-ny_Page_850-02a0001, ... ]
-                self._page_names_w_dir_combine.append( "%02i--%s" % (int(page_name_w_dir.split("/")[0] ), page_name_w_dir.split("/")[1]) )  ### [21-1000_1-cp_Page_0179-r8T0001, 21-105_3-ny_Page_850-02a0001, ... ]
-                self._page_names              .append( page_name_w_dir.split("/")[1] )  ### [1000_1-cp_Page_0179-r8T0001, 105_3-ny_Page_850-02a0001, ... ]
+                self._page_names_w_dir_combine_sep.append( "%02i/%s"  % (int(page_name_w_dir.split("/")[0] ), page_name_w_dir.split("/")[1]) )  ### [21/1000_1-cp_Page_0179-r8T0001, 21/105_3-ny_Page_850-02a0001, ... ]
                 self._img_paths .append(self.db_root + "/img/" + page_name_w_dir + ".png" )
                 self._alb_paths .append(self.db_root + "/alb/" + page_name_w_dir + ".png" )
                 self._wc_paths  .append(self.db_root + "/wc/"  + page_name_w_dir + ".exr" )
