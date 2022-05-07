@@ -31,6 +31,17 @@ class Doc3D:
 
     def __init__(self, root):
         self.db_root = root  ### Doc3D
+        self.db_base_name_dir_string = self.db_root + "/img/%i"
+
+        self.dir_amount = 21
+        self.dir_data_amounts = [4999, 5000, 5000, 5000, 5000, 5000, 5000, 2066, 4999, 5000,
+                                 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000,
+                                 5000 - 2]  ### 102064 - 2 ( 去掉 21/2_431_3-cp_Page_0802-Pum0001 和 21/556_7-ny_Page_183-cvM0001)
+        self.dir_data_amounts_acc = np.cumsum(self.dir_data_amounts)
+        ### array([   4999,   9999,  14999,  19999,  24999,  29999,  34999,  37065,  42064,  47064,
+        ###          52064,  57064,  62064,  67064,  72064,  77064,  82064,  87064,  92064,  97064,
+        ###         102064 ], dtype=int32)
+
         self._page_names = None
         self._page_names_w_dir = None
         self._page_names_w_dir_combine = None
@@ -41,6 +52,11 @@ class Doc3D:
         self._uv_paths   = None
         # self.get_doc3d_kinds_of_paths()   ### 不要在這邊直接呼叫，我下面會建立 real_doc3D物件， 在這邊呼叫就代表一定要插 2T Doc3D 硬碟 才能跑！
         ### 所以改成 跟try_forward 一樣， 寫成 property 的感覺囉！
+
+    @property
+    def page_names(self):
+        if(self._page_names is None): self.get_doc3d_kinds_of_paths()
+        return self._page_names
 
     @property
     def page_names_w_dir(self):
@@ -57,11 +73,7 @@ class Doc3D:
         if(self._page_names_w_dir_combine_sep is None): self.get_doc3d_kinds_of_paths()
         return self._page_names_w_dir_combine_sep
 
-    @property
-    def page_names(self):
-        if(self._page_names is None): self.get_doc3d_kinds_of_paths()
-        return self._page_names
-
+    #############################################################################################
     @property
     def img_paths(self):
         if(self._img_paths is None): self.get_doc3d_kinds_of_paths()
@@ -82,46 +94,45 @@ class Doc3D:
         if(self._uv_paths is None): self.get_doc3d_kinds_of_paths()
         return self._uv_paths
 
-    def get_doc3d_kinds_of_paths(self):
-        print("get_doc3d_kinds_of_paths( here~~~~~ should just be used only once!應該只會被用到一次")
+    def _get_base_name(self):
+        '''
+        走訪 db_base_name_dir_string 指定的 資料夾， 抓出 names
+        '''
+        self._page_names = []
         self._page_names_w_dir = []
         self._page_names_w_dir_combine = []
         self._page_names_w_dir_combine_sep = []
-        self._page_names = []
-        self._img_paths  = []
-        self._alb_paths  = []
-        self._wc_paths   = []
-        self._uv_paths   = []
-        doc3d_dir_names = [self.db_root + "/img/%i" % i for i in range(1, 22)]  ### ["F:/swat3D/1", "F:/swat3D/2", ..., "F:/swat3D/21"]
+
+        doc3d_dir_names = [self.db_base_name_dir_string % i for i in range(1, 22)]  ### ["F:/swat3D/1", "F:/swat3D/2", ..., "F:/swat3D/21"]
         for i , name_dir in enumerate(doc3d_dir_names):
             dir_id = i + 1
             names = os.listdir(name_dir)  ### [1000_1-cp_Page_0179-r8T0001.png, 105_3-ny_Page_850-02a0001.png, ... ]
             for name in names:
                 page_name_w_dir = str(dir_id) + "/" + name[: -4]  ### 去掉副檔名 和 加上 dir_id，比如 21/1000_1-cp_Page_0179-r8T0001 就是一個 page_name_w_dir
-                self._page_names_w_dir            .append( page_name_w_dir)          ### [21/1000_1-cp_Page_0179-r8T0001, 21/105_3-ny_Page_850-02a0001, ... ]
-                self._page_names_w_dir_combine    .append( "%02i--%s" % (int(page_name_w_dir.split("/")[0] ), page_name_w_dir.split("/")[1]) )  ### [21--1000_1-cp_Page_0179-r8T0001, 21--105_3-ny_Page_850-02a0001, ... ]
-                self._page_names_w_dir_combine_sep.append( "%02i/%s"  % (int(page_name_w_dir.split("/")[0] ), page_name_w_dir.split("/")[1]) )  ### [21/1000_1-cp_Page_0179-r8T0001, 21/105_3-ny_Page_850-02a0001, ... ]
+                self._page_names_w_dir            .append( page_name_w_dir)                                                                     ### 資料夾 為 %i  ，舉例：[ 1/1_1_1-pr_Page_141-PZU0001,   1/1_1_8-pp_Page_465-YHc0001,  ... , 21/1000_1-cp_Page_0179-r8T0001,  21/105_3-ny_Page_850-02a0001, ... ]
+                self._page_names_w_dir_combine    .append( "%02i--%s" % (int(page_name_w_dir.split("/")[0] ), page_name_w_dir.split("/")[1]) )  ### 資料夾 為 %02i，舉例：[01--1_1_1-pr_Page_141-PZU0001, 01--1_1_8-pp_Page_465-YHc0001, ... , 21--1000_1-cp_Page_0179-r8T0001, 21--105_3-ny_Page_850-02a0001, ... ]
+                self._page_names_w_dir_combine_sep.append( "%02i/%s"  % (int(page_name_w_dir.split("/")[0] ), page_name_w_dir.split("/")[1]) )  ### 資料夾 為 %02i，舉例：[01/1_1_1-pr_Page_141-PZU0001,  01/1_1_8-pp_Page_465-YHc0001,  ... , 21/1000_1-cp_Page_0179-r8T0001,  21/105_3-ny_Page_850-02a0001, ... ]
                 self._page_names                  .append( page_name_w_dir.split("/")[1] )  ### [1000_1-cp_Page_0179-r8T0001, 105_3-ny_Page_850-02a0001, ... ]
-                self._img_paths .append(self.db_root + "/img/" + page_name_w_dir + ".png" )
-                self._alb_paths .append(self.db_root + "/alb/" + page_name_w_dir + ".png" )
-                self._wc_paths  .append(self.db_root + "/wc/"  + page_name_w_dir + ".exr" )
-                self._uv_paths  .append(self.db_root + "/uv/"  + page_name_w_dir + ".exr" )
             names.sort(key=lambda name: ("%04i" % int(name.split("_")[0]) + "%04i" % int(name.split("_")[1].split("-")[0]) + name.split("_")[2].split("-")[0]))  ### 這一步只是想把 list 內容物 的順序 弄得很像 windows 資料夾內的 排序方式比較好找資料，省略也沒關係喔！
 
+    def get_doc3d_kinds_of_paths(self):
+        print("get_doc3d_kinds_of_paths( here~~~~~ should just be used only once!應該只會被用到一次")
+        self._get_base_name()
 
-class Real_Doc3D(Doc3D):
+        self._img_paths  = []
+        self._alb_paths  = []
+        self._wc_paths   = []
+        self._uv_paths   = []
+        for page_name_w_dir in self.page_names_w_dir:
+            self._img_paths .append(self.db_root + "/img/" + page_name_w_dir + ".png" )
+            self._alb_paths .append(self.db_root + "/alb/" + page_name_w_dir + ".png" )
+            self._wc_paths  .append(self.db_root + "/wc/"  + page_name_w_dir + ".exr" )
+            self._uv_paths  .append(self.db_root + "/uv/"  + page_name_w_dir + ".exr" )
+
+
+class Make_Doc3D(Doc3D):
     def __init__(self, root):
-        super(Real_Doc3D, self).__init__(root)
-        self.dir_amount = 21
-        self.dir_data_amounts = [4999, 5000, 5000, 5000, 5000, 5000, 5000, 2066, 4999, 5000,
-                                 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000, 5000,
-                                 5000]  ### 102064
-        self.dir_data_amounts_acc = np.cumsum(self.dir_data_amounts)
-        ### array([   4999,   9999,  14999,  19999,  24999,  29999,  34999,  37065,  42064,  47064,
-        ###          52064,  57064,  62064,  67064,  72064,  77064,  82064,  87064,  92064,  97064,
-        ###         102064 ], dtype=int32)
-
-
+        super(Make_Doc3D, self).__init__(root)
 
     def _make_fake_some_db(self, dir_key, dst_dir, build_dir_fake_amount=1, sep_dir=True, print_msg=False):
         # self.get_doc3d_kinds_of_paths()
@@ -183,15 +194,15 @@ class Real_Doc3D(Doc3D):
         self.make_fake_wc_db (dst_dir=dst_dir, build_dir_fake_amount=build_dir_fake_amount, sep_dir=sep_dir, print_msg=False)
         self.make_fake_uv_db (dst_dir=dst_dir, build_dir_fake_amount=build_dir_fake_amount, sep_dir=sep_dir, print_msg=False)
 
-class Fake_Doc3D(Doc3D):
+class Fake_Doc3D(Doc3D):  ### 只是為了好閱讀寫的， 給 Make_Doc3D 做出來的 小 doc3D用
     def __init__(self, root):
         super(Fake_Doc3D, self).__init__(root)
 
-
 ### 真的完整十萬張的 Doc3D
-# real_doc3D = Real_Doc3D(root="G:/swat3D")  ### VAIO 電腦
-# real_doc3D = Real_Doc3D(root="K:/swat3D")  ### 127.35
-real_doc3D = Real_Doc3D(root="J:/swat3D")  ### 127.23 2022/04/11
+# real_doc3D = Doc3D(root="G:/swat3D")  ### VAIO 電腦
+# real_doc3D = Doc3D(root="K:/swat3D")  ### 127.35
+# real_doc3D = Doc3D(root="G:/swat3D")  ### 127.23 2022/04/11
+real_doc3D = Doc3D(root="G:/swat3D")         ### 127.23 2022/05/04
 
 
 ### 可以做一個小規模的 模擬Real_Doc3D 的 Fake_Doc3D
@@ -206,8 +217,10 @@ using_doc3D = real_doc3D
 
 
 if(__name__ == "__main__"):
+    make_doc3D = Make_Doc3D(root="G:/swat3D")
+
     try_doc3D_path       = "L:/try_Doc3D_50"        ### 127.23 2022/04/11
     try_doc3D_merge_path = "L:/try_Doc3D_50_merge"  ### 127.23 2022/04/11
 
-    real_doc3D.make_fake_db(dst_dir=try_doc3D_path,       build_dir_fake_amount=50)
-    real_doc3D.make_fake_db(dst_dir=try_doc3D_merge_path, build_dir_fake_amount=50, sep_dir=False)
+    make_doc3D.make_fake_db(dst_dir=try_doc3D_path,       build_dir_fake_amount=50)
+    make_doc3D.make_fake_db(dst_dir=try_doc3D_merge_path, build_dir_fake_amount=50, sep_dir=False)
