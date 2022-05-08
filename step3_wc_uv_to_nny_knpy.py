@@ -50,24 +50,24 @@ def wc_uv_2_npy_knpy(doc3d, dst_dir, use_sep_name=False, job_id=1, ord_z_bot=Non
     W_w_M_knpy_dir = f"{wc_dst_dir}-5_W_w_M_knpy"
 
     ### 因為檔案太多容易失敗， 所以就不要build_new_dir囉！
-    if  (job_id == "1_uv-1_npy"        ): Check_dir_exist_and_build(uv_npy_dir)
-    elif(job_id == "1_uv-2_visual"     ): Check_dir_exist_and_build(uv_vis_dir)
-    elif(job_id == "1_uv-3_knpy"       ): Check_dir_exist_and_build(uv_knpy_dir)
-    elif(job_id == "2_wc-1_npy"        ): Check_dir_exist_and_build(wc_npy_dir)
-    elif(job_id == "2_wc-2_2D_visual"  ): Check_dir_exist_and_build(wc_vis_2d_dir)
-    elif(job_id == "2_wc-3_3D_visual"  ): Check_dir_exist_and_build(wc_vis_3d_dir)
-    elif(job_id == "2_wc-4_W_w_M_npy"  ): Check_dir_exist_and_build(W_w_M_npy_dir)
-    elif(job_id == "2_wc-5_W_w_M_knpy" ): Check_dir_exist_and_build(W_w_M_knpy_dir)
+    if("1_uv-1_npy"        in job_id): Check_dir_exist_and_build(uv_npy_dir)
+    if("1_uv-2_visual"     in job_id): Check_dir_exist_and_build(uv_vis_dir)
+    if("1_uv-3_knpy"       in job_id): Check_dir_exist_and_build(uv_knpy_dir)
+    if("2_wc-1_npy"        in job_id): Check_dir_exist_and_build(wc_npy_dir)
+    if("2_wc-2_2D_visual"  in job_id): Check_dir_exist_and_build(wc_vis_2d_dir)
+    if("2_wc-3_3D_visual"  in job_id): Check_dir_exist_and_build(wc_vis_3d_dir)
+    if("2_wc-4_W_w_M_npy"  in job_id): Check_dir_exist_and_build(W_w_M_npy_dir)
+    if("2_wc-5_W_w_M_knpy" in job_id): Check_dir_exist_and_build(W_w_M_knpy_dir)
 
-    if  (job_id == "1_uv-1_npy"        and use_sep_name is True): build_sep_dir(uv_npy_dir)
-    elif(job_id == "1_uv-2_visual"     and use_sep_name is True): build_sep_dir(uv_vis_dir)
-    elif(job_id == "1_uv-3_knpy"       and use_sep_name is True): build_sep_dir(uv_knpy_dir)
+    if("1_uv-1_npy"        in job_id and use_sep_name is True): build_sep_dir(uv_npy_dir)
+    if("1_uv-2_visual"     in job_id and use_sep_name is True): build_sep_dir(uv_vis_dir)
+    if("1_uv-3_knpy"       in job_id and use_sep_name is True): build_sep_dir(uv_knpy_dir)
 
-    elif(job_id == "2_wc-1_npy"        and use_sep_name is True): build_sep_dir(wc_npy_dir)
-    elif(job_id == "2_wc-2_2D_visual"  and use_sep_name is True): build_sep_dir(wc_vis_2d_dir)
-    elif(job_id == "2_wc-3_3D_visual"  and use_sep_name is True): build_sep_dir(wc_vis_3d_dir)
-    elif(job_id == "2_wc-4_W_w_M_npy"  and use_sep_name is True): build_sep_dir(W_w_M_npy_dir)
-    elif(job_id == "2_wc-5_W_w_M_knpy" and use_sep_name is True): build_sep_dir(W_w_M_knpy_dir)
+    if("2_wc-1_npy"        in job_id and use_sep_name is True): build_sep_dir(wc_npy_dir)
+    if("2_wc-2_2D_visual"  in job_id and use_sep_name is True): build_sep_dir(wc_vis_2d_dir)
+    if("2_wc-3_3D_visual"  in job_id and use_sep_name is True): build_sep_dir(wc_vis_3d_dir)
+    if("2_wc-4_W_w_M_npy"  in job_id and use_sep_name is True): build_sep_dir(W_w_M_npy_dir)
+    if("2_wc-5_W_w_M_knpy" in job_id and use_sep_name is True): build_sep_dir(W_w_M_knpy_dir)
 
     dst_dict = {
         "uv_npy_dir"     : uv_npy_dir,
@@ -93,14 +93,14 @@ def wc_uv_2_npy_knpy(doc3d, dst_dir, use_sep_name=False, job_id=1, ord_z_bot=Non
 
     _wc_uv_2_npy_knpy_multiprocess(doc3d, dst_dict, use_sep_name=use_sep_name, job_id=job_id, ord_z_bot=ord_z_bot, ord_z_top=ord_z_top, core_amount=core_amount, task_amount=task_amount, task_start_index=task_start_index)
 
-    if  (job_id == "1_uv-1_npy"        ): Save_as_jpg(uv_npy_dir     , uv_npy_dir     , delete_ord_file=True)
-    elif(job_id == "1_uv-2_visual"     ): Save_as_jpg(uv_vis_dir     , uv_vis_dir     , delete_ord_file=True)
-    elif(job_id == "1_uv-3_knpy"       ): Save_as_jpg(uv_knpy_dir    , uv_knpy_dir    , delete_ord_file=True)
-    elif(job_id == "2_wc-1_npy"        ): Save_as_jpg(wc_npy_dir     , wc_npy_dir     , delete_ord_file=True)
-    elif(job_id == "2_wc-2_2D_visual"  ): Save_as_jpg(wc_vis_2d_dir  , wc_vis_2d_dir  , delete_ord_file=True)
-    elif(job_id == "2_wc-3_3D_visual"  ): Save_as_jpg(wc_vis_3d_dir  , wc_vis_3d_dir  , delete_ord_file=True)
-    elif(job_id == "2_wc-4_W_w_M_npy"  ): Save_as_jpg(W_w_M_npy_dir  , W_w_M_npy_dir  , delete_ord_file=True)
-    elif(job_id == "2_wc-5_W_w_M_knpy" ): Save_as_jpg(W_w_M_knpy_dir , W_w_M_knpy_dir , delete_ord_file=True)
+    if("1_uv-1_npy"        in job_id): Save_as_jpg(uv_npy_dir     , uv_npy_dir     , delete_ord_file=True)
+    if("1_uv-2_visual"     in job_id): Save_as_jpg(uv_vis_dir     , uv_vis_dir     , delete_ord_file=True)
+    if("1_uv-3_knpy"       in job_id): Save_as_jpg(uv_knpy_dir    , uv_knpy_dir    , delete_ord_file=True)
+    if("2_wc-1_npy"        in job_id): Save_as_jpg(wc_npy_dir     , wc_npy_dir     , delete_ord_file=True)
+    if("2_wc-2_2D_visual"  in job_id): Save_as_jpg(wc_vis_2d_dir  , wc_vis_2d_dir  , delete_ord_file=True)
+    if("2_wc-3_3D_visual"  in job_id): Save_as_jpg(wc_vis_3d_dir  , wc_vis_3d_dir  , delete_ord_file=True)
+    if("2_wc-4_W_w_M_npy"  in job_id): Save_as_jpg(W_w_M_npy_dir  , W_w_M_npy_dir  , delete_ord_file=True)
+    if("2_wc-5_W_w_M_knpy" in job_id): Save_as_jpg(W_w_M_knpy_dir , W_w_M_knpy_dir , delete_ord_file=True)
     print("total_cost_time:", time.time() - start_time)
 
 def _wc_uv_2_npy_knpy_multiprocess(doc3d, dst_dict, use_sep_name, job_id, ord_z_bot, ord_z_top, core_amount, task_amount, task_start_index):
@@ -206,43 +206,43 @@ def _wc_uv_2_npy_knpy(start_index, amount, doc3d, dst_dict, use_sep_name, job_id
 
         ####### 存到相對應的位置
         ##### uv part
-        if(job_id == "1_uv-1_npy"):
+        if("1_uv-1_npy" in job_id):
             ### uv-1_npy
             np.save(uv_npy_path, uv)
 
-        elif(job_id == "1_uv-2_visual"):
+        if("1_uv-2_visual" in job_id):
             ### uv-2_visual
             fig, ax = uv_2d_plot(uv[..., ::-1], figsize=(5, 5))
             plt.savefig(uv_vis_path)
             plt.close()
 
-        elif(job_id == "1_uv-3_knpy"):
+        if("1_uv-3_knpy" in job_id):
             ### uv-3_knpy
             Save_npy_path_as_knpy(src_path=uv_npy_path, dst_path=uv_knpy_path)
 
-        elif(job_id == "2_wc-1_npy"):
+        if("2_wc-1_npy" in job_id):
             ##### wc part
             ### wc-1_npy
             np.save(wc_npy_path, Wzyx)
 
-        elif(job_id == "2_wc-2_2D_visual"):
+        if("2_wc-2_2D_visual" in job_id):
             ### wc-2_2D_visual
             fig, ax = wc_2d_plot(Wzyx, figsize=(5, 5))
             plt.savefig(wc_vis_2d_path)
             plt.close()
 
-        elif(job_id == "2_wc-3_3D_visual"):
+        if("2_wc-3_3D_visual" in job_id):
             ### wc-3_3D_visual
             fig, ax = wc_3d_plot(Wzyx_3D_good_to_v, mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z
             plt.savefig(wc_vis_3d_path)
             # plt.show()
             plt.close()
 
-        elif(job_id == "2_wc-4_W_w_M_npy"):
+        if("2_wc-4_W_w_M_npy" in job_id):
             ### wc-4_W_w_M_npy
             np.save(W_w_M_npy_path, Wzyx_w_M)
 
-        elif(job_id == "2_wc-5_W_w_M_knpy"):
+        if("2_wc-5_W_w_M_knpy" in job_id):
             ### wc-5_W_w_M_knpy
             Save_npy_path_as_knpy(src_path=W_w_M_npy_path, dst_path=W_w_M_knpy_path)
 
