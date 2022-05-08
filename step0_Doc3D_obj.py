@@ -106,7 +106,8 @@ class Doc3D:
         doc3d_dir_names = [self.db_base_name_dir_string % i for i in range(1, 22)]  ### ["F:/swat3D/1", "F:/swat3D/2", ..., "F:/swat3D/21"]
         for i , name_dir in enumerate(doc3d_dir_names):
             dir_id = i + 1
-            names = os.listdir(name_dir)  ### [1000_1-cp_Page_0179-r8T0001.png, 105_3-ny_Page_850-02a0001.png, ... ]
+            if(os.path.isdir(name_dir)):  ### 要考慮到不完整的case， 比如因為500G SSD 空間不夠大 只做到 1~15， 16~21就不存在
+                names = os.listdir(name_dir)  ### [1000_1-cp_Page_0179-r8T0001.png, 105_3-ny_Page_850-02a0001.png, ... ]
             for name in names:
                 page_name_w_dir = str(dir_id) + "/" + name[: -4]  ### 去掉副檔名 和 加上 dir_id，比如 21/1000_1-cp_Page_0179-r8T0001 就是一個 page_name_w_dir
                 self._page_names_w_dir            .append( page_name_w_dir)                                                                     ### 資料夾 為 %i  ，舉例：[ 1/1_1_1-pr_Page_141-PZU0001,   1/1_1_8-pp_Page_465-YHc0001,  ... , 21/1000_1-cp_Page_0179-r8T0001,  21/105_3-ny_Page_850-02a0001, ... ]
