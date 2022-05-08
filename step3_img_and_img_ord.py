@@ -28,6 +28,9 @@ import time
 import matplotlib.pyplot as plt
 import shutil
 
+from step0_Doc3D_obj import real_doc3D
+from step0_Kong_Doc3D import kong_doc3D
+
 def build_sep_dir(dir_path):
     for i in range(21):
         Check_dir_exist_and_build(f"{dir_path}/%02i" % (i + 1))
@@ -49,7 +52,8 @@ def dis_img_and_rec_hope(doc3d, dst_dir, use_sep_name=False, job_id=1, just_do_w
         "rec_hope_dir" : rec_hope_dir,
     }
 
-    task_amount      = len(doc3d.img_paths)
+    if  (type(doc3d) == type(real_doc3D)): task_amount = len(doc3d.img_paths)
+    elif(type(doc3d) == type(kong_doc3D)): task_amount = len(doc3d.dis_img_paths)
     task_start_index = 0
     if(just_do_what_dir_num is not None):  ### 看有沒有指定要做 1 ~ 21 中的哪個資料夾
         just_do_what_dir_index = just_do_what_dir_num - 1
@@ -79,17 +83,26 @@ def _dis_img_and_rec_hope(start_index, amount, doc3d, dst_dict, use_sep_name, jo
 
         ####### 做事情的地方
         if  (job_id == 1):
-            shutil.copy(doc3d.img_paths[i], dis_img_path)
+            if  (type(doc3d) == type(real_doc3D)) : shutil.copy(doc3d.img_paths[i], dis_img_path)
+            elif(type(doc3d) == type(kong_doc3D)) : shutil.copy(doc3d.dis_img_paths[i], dis_img_path)
 
         elif(job_id == 2):
-            dis_img         = cv2.imread(doc3d.img_paths[i])
-            uv              = get_exr(doc3d.uv_paths [i])
+            if  (type(doc3d) == type(real_doc3D)):
+                dis_img         = cv2.imread(doc3d.img_paths[i])
+                uv              = get_exr(doc3d.uv_paths [i])
+            elif(type(doc3d) == type(kong_doc3D)) :
+                dis_img         = cv2.imread(doc3d.dis_img_paths[i])
+                uv              = np.load(doc3d.uv_npy_paths [i])
+
             bm  = use_flow_to_get_bm(flow=uv, flow_scale=448)
             rec = use_bm_to_rec_img(bm=bm, dis_img=dis_img, flow_scale=448)
             cv2.imwrite(rec_hope_path, rec)
 
 if(__name__ == "__main__"):
-    from step0_Doc3D_obj import  using_doc3D
+    from step0_Doc3D_obj  import  real_doc3D
+    from step0_Kong_Doc3D import  kong_doc3D
+    # using_doc3D = real_doc3D
+    using_doc3D = kong_doc3D
     ###########################################################################################################
     ### 做事1
     ### 101838
