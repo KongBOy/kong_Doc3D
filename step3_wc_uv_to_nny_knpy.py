@@ -130,21 +130,25 @@ def _wc_uv_2_npy_knpy(start_index, amount, doc3d, dst_dict, use_sep_name, job_id
         Wx = Wzxy_w_M[..., 1:2].copy()
         Wy = Wzxy_w_M[..., 2:3].copy()
         Wzyx_w_M = Wzxy_w_M.copy()
-        Wzyx_w_M[..., 1:2] = Wy
-        Wzyx_w_M[..., 2:3] = Wx
-        Wzyx = Wzyx_w_M[..., :3]
+        Wzyx_w_M[..., 1:2] = Wy.copy()
+        Wzyx_w_M[..., 2:3] = Wx.copy()
+        Wzyx = Wzyx_w_M[..., :3].copy()
 
         ### z 置中 (需要先知道 原始 doc3d 的 z_min/max 喔！)
         if(None not in [ord_z_bot, ord_z_top]):
             # ord_z_range = ord_z_top - ord_z_bot
             ord_z = Wzxy_w_M[..., 0:1].copy()
-            ord_z_w_M = ord_z[mask]
+            ord_z_w_M = ord_z[mask.astype(np.bool)]
             ord_z_w_M_top = ord_z_w_M.max()
             ord_z_w_M_bot = ord_z_w_M.min()
             ord_z_w_M_top_res = abs( ord_z_top - ord_z_w_M_top )
             ord_z_w_M_bot_res = abs( ord_z_bot - ord_z_w_M_bot )
-            z_move = ord_z_w_M_bot_res - ord_z_w_M_top_res
-            Wzyx[..., 0:1] += z_move
+            z_move = (ord_z_w_M_bot_res - ord_z_w_M_top_res) / 2
+            # fig, ax = wc_3d_plot(Wzyx[..., ::-1], mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z
+            Wzyx    [..., 0] -= z_move
+            # fig, ax = wc_3d_plot(Wzyx[..., ::-1], mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z
+            # plt.show()
+            Wzyx_w_M[..., 0] -= z_move
 
 
         Wzyx_3D_good_to_v = Wzyx[..., ::-1]  ### 嘗試幾次後，這樣子比較好看，剛好變 xyz很好視覺化
