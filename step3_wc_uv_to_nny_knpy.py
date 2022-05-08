@@ -247,7 +247,7 @@ def _wc_uv_2_npy_knpy(start_index, amount, doc3d, dst_dict, use_sep_name, job_id
             Save_npy_path_as_knpy(src_path=W_w_M_npy_path, dst_path=W_w_M_knpy_path)
 
 if(__name__ == "__main__"):
-    from step0_Doc3D_obj import  using_doc3D
+    using_doc3D = kong_doc3D
     ###########################################################################################################
     ### 做事1
     ### 101838
