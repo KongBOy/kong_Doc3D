@@ -27,6 +27,9 @@ import os
 import time
 import matplotlib.pyplot as plt
 
+from step0_Doc3D_obj  import  real_doc3D
+from step0_Kong_Doc3D import  kong_doc3D
+
 def build_sep_dir(dir_path):
     for i in range(21):
         Check_dir_exist_and_build(f"{dir_path}/%02i" % (i + 1))
@@ -77,7 +80,8 @@ def wc_uv_2_npy_knpy(doc3d, dst_dir, use_sep_name=False, job_id=1, ord_z_bot=Non
         "W_w_M_knpy_dir" : W_w_M_knpy_dir,
     }
 
-    task_amount      = len(doc3d.wc_paths)
+    if  (type(doc3d) == type(real_doc3D)): task_amount = len(doc3d.wc_paths)
+    elif(type(doc3d) == type(kong_doc3D)): task_amount = len(doc3d.wc_npy_paths)
     task_start_index = 0
     if(just_do_what_dir_num is not None):
         just_do_what_dir_index = just_do_what_dir_num - 1
@@ -119,36 +123,68 @@ def _wc_uv_2_npy_knpy(start_index, amount, doc3d, dst_dict, use_sep_name, job_id
         W_w_M_knpy_path = dst_dict["W_w_M_knpy_dir"] + "/" + use_what_name + ".knpy"
 
         ####### 做事情的地方
-        uv              = get_exr(doc3d.uv_paths[i])
+        if  (type(doc3d) == type(real_doc3D)): uv = get_exr(doc3d.uv_paths[i])
+        elif(type(doc3d) == type(kong_doc3D)): uv = np.load(doc3d.uv_npy_paths[i])
         mask            = uv[..., 0]
 
-        wc_zxy             = get_exr(doc3d.wc_paths[i])  ### z, x, y, ?
-        Wzxy_w_M           = wc_zxy.copy()
-        Wzxy_w_M[..., 3]   = mask
+        ### 原始 Doc3D 需要 1.加入M, 2.x, y 對調
+        if  (type(doc3d) == type(real_doc3D)):
+            ### 1. 加入M
+            wc_zxy = get_exr(doc3d.wc_paths[i])  ### z, x, y, ?
+            wc_zxy             = get_exr(doc3d.wc_paths[i])  ### z, x, y, ?
+            Wzxy_w_M           = wc_zxy.copy()
+            Wzxy_w_M[..., 3]   = mask
 
-        ### x, y 對調
-        Wx = Wzxy_w_M[..., 1:2].copy()
-        Wy = Wzxy_w_M[..., 2:3].copy()
-        Wzyx_w_M = Wzxy_w_M.copy()
-        Wzyx_w_M[..., 1:2] = Wy.copy()
-        Wzyx_w_M[..., 2:3] = Wx.copy()
-        Wzyx = Wzyx_w_M[..., :3].copy()
+            ### 2. x, y 對調
+            Wx = Wzxy_w_M[..., 1:2].copy()
+            Wy = Wzxy_w_M[..., 2:3].copy()
+            Wzyx_w_M = Wzxy_w_M.copy()
+            Wzyx_w_M[..., 1:2] = Wy.copy()
+            Wzyx_w_M[..., 2:3] = Wx.copy()
+            Wzyx = Wzyx_w_M[..., :3].copy()
 
-        ### z 置中 (需要先知道 原始 doc3d 的 z_min/max 喔！)
+        ### Kong_Doc3D 第一版 已經 做完 加入M 和 xy對調了， 所以直接讀出來即可
+        elif(type(doc3d) == type(kong_doc3D)):
+            Wzyx     = np.load(doc3d.wc_npy_paths[i])
+            Wzyx_w_M = np.load(doc3d.W_w_M_npy_paths[i])
+
+        ##### 原始Doc3D 和 Kong_Doc3D 第一版 都要做， 在Kong_Doc3D第一版實際訓練下去才發現這個問題！ 1.x軸相反, 2.z置中
+        ### 1. x值reverse
+        # fig, ax = wc_3d_plot(Wzyx[..., ::-1], mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z
+        Wzyx    [..., 2] *= -1
+        # fig, ax = wc_3d_plot(Wzyx[..., ::-1], mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z
+
+        # Wzyx_3D_good_to_v = Wzyx_w_M[...,0 : 3].copy()   ### 嘗試幾次後，這樣子比較好看，剛好變 xyz很好視覺化
+        # Wzyx_3D_good_to_v = Wzyx_3D_good_to_v[...,::-1]  ### 嘗試幾次後，這樣子比較好看，剛好變 xyz很好視覺化
+        # fig, ax = wc_3d_plot(Wzyx_3D_good_to_v, mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z
+        Wzyx_w_M[..., 2] *= -1
+        # Wzyx_3D_good_to_v = Wzyx_w_M[...,0 : 3].copy()   ### 嘗試幾次後，這樣子比較好看，剛好變 xyz很好視覺化
+        # Wzyx_3D_good_to_v = Wzyx_3D_good_to_v[...,::-1]  ### 嘗試幾次後，這樣子比較好看，剛好變 xyz很好視覺化
+        # fig, ax = wc_3d_plot(Wzyx_3D_good_to_v, mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z
+        # plt.show()
+
+        ### 2. z 置中 (需要先知道 原始 doc3d 的 z_min/max 喔！)
         if(None not in [ord_z_bot, ord_z_top]):
             # ord_z_range = ord_z_top - ord_z_bot
-            ord_z = Wzxy_w_M[..., 0:1].copy()
-            ord_z_w_M = ord_z[mask.astype(np.bool)]
-            ord_z_w_M_top = ord_z_w_M.max()
-            ord_z_w_M_bot = ord_z_w_M.min()
-            ord_z_w_M_top_res = abs( ord_z_top - ord_z_w_M_top )
-            ord_z_w_M_bot_res = abs( ord_z_bot - ord_z_w_M_bot )
-            z_move = (ord_z_w_M_bot_res - ord_z_w_M_top_res) / 2
+            Z = Wzyx_w_M[..., 0:1].copy()
+            Z_w_M = Z[mask.astype(np.bool)]
+            Z_w_M_top = Z_w_M.max()
+            Z_w_M_bot = Z_w_M.min()
+            Z_w_M_top_res = abs( ord_z_top - Z_w_M_top )
+            Z_w_M_bot_res = abs( ord_z_bot - Z_w_M_bot )
+            z_move = (Z_w_M_bot_res - Z_w_M_top_res) / 2
             # fig, ax = wc_3d_plot(Wzyx[..., ::-1], mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z
             Wzyx    [..., 0] -= z_move
             # fig, ax = wc_3d_plot(Wzyx[..., ::-1], mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z
-            # plt.show()
+
+            # Wzyx_3D_good_to_v = Wzyx_w_M[...,0 : 3].copy()   ### 嘗試幾次後，這樣子比較好看，剛好變 xyz很好視覺化
+            # Wzyx_3D_good_to_v = Wzyx_3D_good_to_v[...,::-1]  ### 嘗試幾次後，這樣子比較好看，剛好變 xyz很好視覺化
+            # fig, ax = wc_3d_plot(Wzyx_3D_good_to_v, mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z
             Wzyx_w_M[..., 0] -= z_move
+            # Wzyx_3D_good_to_v = Wzyx_w_M[...,0 : 3].copy()   ### 嘗試幾次後，這樣子比較好看，剛好變 xyz很好視覺化
+            # Wzyx_3D_good_to_v = Wzyx_3D_good_to_v[...,::-1]  ### 嘗試幾次後，這樣子比較好看，剛好變 xyz很好視覺化
+            # fig, ax = wc_3d_plot(Wzyx_3D_good_to_v, mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z
+            # plt.show()
 
 
         Wzyx_3D_good_to_v = Wzyx[..., ::-1]  ### 嘗試幾次後，這樣子比較好看，剛好變 xyz很好視覺化
