@@ -110,6 +110,14 @@ def F_ow_W_ch_min_max(data_paths, task_amount, core_amount=10, print_msg=False):
             # total_cost_time: 5963.885419368744
 
     v2
+        wc  1~15
+            ch0_maxs.max() 0.46694446
+            ch0_mins.min() -0.50429183
+            ch1_maxs.max() 1.2485291
+            ch1_mins.min() -1.2410645
+            ch2_maxs.max() 1.2280148
+            ch2_mins.min() -1.2387834
+            total_cost_time: 139.42432951927185
 
         wc 15~21
             ch0_maxs.max() 0.4421169
@@ -119,6 +127,24 @@ def F_ow_W_ch_min_max(data_paths, task_amount, core_amount=10, print_msg=False):
             ch2_maxs.max() 1.2273213
             ch2_mins.min() -1.2297894
             total_cost_time: 2367.5690183639526
+
+        wc 16~21
+            ch0_maxs.max() 0.4421169
+            ch0_mins.min() -0.47946426
+            ch1_maxs.max() 1.2385225
+            ch1_mins.min() -1.2396094
+            ch2_maxs.max() 1.2273213
+            ch2_mins.min() -1.2297894
+            total_cost_time: 254.20641613006592
+
+        wc 1~21
+            ch0_maxs.max() 0.46694446
+            ch0_mins.min() -0.50429183
+            ch1_maxs.max() 1.2485291
+            ch1_mins.min() -1.2410645
+            ch2_maxs.max() 1.2280148
+            ch2_mins.min() -1.2387834
+            目前用看的
 
         wc 19
             ch0_maxs.max() 0.4421169
