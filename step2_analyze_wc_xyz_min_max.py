@@ -108,6 +108,17 @@ def F_ow_W_ch_min_max(data_paths, task_amount, core_amount=10, print_msg=False):
             # ch2_maxs.max() 1.2485291
             # ch2_mins.min() -1.2410645
             # total_cost_time: 5963.885419368744
+
+    v2
+
+        wc 15~21
+            ch0_maxs.max() 0.4421169
+            ch0_mins.min() -0.47946426
+            ch1_maxs.max() 1.2394472
+            ch1_mins.min() -1.2396094
+            ch2_maxs.max() 1.2273213
+            ch2_mins.min() -1.2297894
+            total_cost_time: 2367.5690183639526
     """
 
 def _F_ow_W_ch_min_max_multiprocess(data_paths, ch0_maxs, ch0_mins, ch1_maxs, ch1_mins, ch2_maxs, ch2_mins, core_amount, task_amount, print_msg=False):
@@ -203,14 +214,18 @@ def _wc_2D_3D_and_uv_visual(start_index, amount, wc_paths, uv_paths, page_names_
 ############################################################################################################################################
 
 if(__name__ == "__main__"):
-    from step0_Doc3D_obj  import using_doc3D
+    from step0_Doc3D_obj  import real_doc3D
     from step0_Kong_Doc3D import kong_doc3D
+    using_doc3D = kong_doc3D
     '''1_244_1-cp_Page_0995-mpT0001.exr'''
     ### 取得 wc_paths
-    wc_paths = using_doc3D.wc_paths
-    uv_paths = using_doc3D.uv_paths
-    page_names_w_dir = using_doc3D.page_names_w_dir
-    # for wc_path in wc_paths: print(wc_path)
+
+    if  (type(using_doc3D) == type(real_doc3D)):
+        wc_paths = using_doc3D.wc_paths
+        uv_paths = using_doc3D.uv_paths
+    elif(type(using_doc3D) == type(kong_doc3D)):
+        wc_paths = using_doc3D.wc_npy_paths
+        uv_paths = using_doc3D.uv_npy_paths
 
     ### 設定 要處理的數量
     # datas_amount = 2000 #len(wc_paths)  ### 少量測試時用的
@@ -225,4 +240,5 @@ if(__name__ == "__main__"):
     F_ow_W_ch_min_max(kong_doc3D.W_w_M_npy_paths, datas_amount, core_amount=datas_amount // 150)  ### core_amount 這樣設可避免 爆記憶體 喔
 
     ### 分析2
+    # page_names_w_dir = using_doc3D.page_names_w_dir
     # wc_2D_3D_and_uv_visual(wc_paths, uv_paths, page_names_w_dir, dst_dir=r"H:")
