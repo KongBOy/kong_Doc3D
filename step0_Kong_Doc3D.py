@@ -4,6 +4,7 @@ class Kong_Doc3D(Doc3D):
     def __init__(self, root, use_sep_name=True):
         super(Kong_Doc3D, self).__init__(root)
         self.db_base_name_dir_string = self.db_root + "/0_dis_img/%02i"  ### overwrite 父class
+        # self.db_base_name_dir_string = self.db_root + "/2_wc-4_W_w_M_npy/%02i"  ### overwrite 父class， 有些不完整的 Kong_Doc3D 可能會用到， 比如 500GB SSD 容量太小只能裝不完整 Kong_Doc3D
 
         self.use_sep_name = use_sep_name
 
