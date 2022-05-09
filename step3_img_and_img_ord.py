@@ -103,21 +103,24 @@ if(__name__ == "__main__"):
     from step0_Kong_Doc3D import  kong_doc3D
     # using_doc3D = real_doc3D
     using_doc3D = kong_doc3D
-    ###########################################################################################################
     ### 做事1
     ### 101838
     ### 102064 - 2 ( 去掉 21/2_431_3-cp_Page_0802-Pum0001 和 21/556_7-ny_Page_183-cvM0001)
     SSD_dst_dir = "F:/kong_doc3d/train"
     HDD_dst_dir = "I:/kong_doc3d/train"
+    use_sep_name = True
+    just_do_what_dir_nums = [  1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
+                              11, 12, 13, 14, 15,
+                              16, 17, 18, 19, 20, 21 ]
+    ###########################################################################################################
     import datetime
     current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     src_log_dir = f"{SSD_dst_dir}/LOG-{current_time}"
     dst_log_dir = f"{HDD_dst_dir}/LOG-{current_time}"
-    use_sep_name = True
-
     Check_dir_exist_and_build(src_log_dir)  ### 一定要先建立 src_log_dir 要不然LOG檔沒地方存會報錯
-    for dir_num in range(21):
-        just_do_what_dir_num = dir_num + 1
+
+    for just_do_what_dir_num in just_do_what_dir_nums:
+        # if( just_do_what_dir_num != 19): continue
 
         dis_img_and_rec_hope(using_doc3D, dst_dir=SSD_dst_dir, use_sep_name=use_sep_name, job_id=1, just_do_what_dir_num=just_do_what_dir_num, core_amount=2)
         dis_img_and_rec_hope(using_doc3D, dst_dir=SSD_dst_dir, use_sep_name=use_sep_name, job_id=2, just_do_what_dir_num=just_do_what_dir_num, core_amount=10)
