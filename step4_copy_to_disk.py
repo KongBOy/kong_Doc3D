@@ -46,7 +46,9 @@ if(__name__ == "__main__"):
 
     ### use_sep_name = True 的 copy方式 
     want_what_dirs = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', 
-                      '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21',]
+                      '11', '12', '13', '14', '15',
+                      '16', '17', '18', '19', '20', '21',
+                     ]
     for what_dir in want_what_dirs: os.system(f"robocopy {src_dir}/0_dis_img/{what_dir}          {dst_dir}/0_dis_img/{what_dir}          /E /MT:100 /UNILOG:{src_log_dir}/robocopy-0_dis_img-{what_dir}.txt"        )
     for what_dir in want_what_dirs: os.system(f"robocopy {src_dir}/1_uv-3_knpy/{what_dir}        {dst_dir}/1_uv-3_knpy/{what_dir}        /E /MT:100 /UNILOG:{src_log_dir}/robocopy-1_uv-3_knpy-{what_dir}.txt"      )
     for what_dir in want_what_dirs: os.system(f"robocopy {src_dir}/2_wc-5_W_w_M_knpy/{what_dir}  {dst_dir}/2_wc-5_W_w_M_knpy/{what_dir}  /E /MT:100 /UNILOG:{src_log_dir}/robocopy-2_wc-5_W_w_M_knpy-{what_dir}.txt")
