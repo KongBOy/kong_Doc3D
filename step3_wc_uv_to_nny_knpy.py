@@ -174,13 +174,13 @@ def _wc_uv_2_npy_knpy(start_index, amount, doc3d, dst_dict, use_sep_name, job_id
             Z_w_M_bot_res = abs( ord_z_bot - Z_w_M_bot )
             z_move = (Z_w_M_bot_res - Z_w_M_top_res) / 2
             # fig, ax = wc_3d_plot(Wzyx[..., ::-1], mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z
-            Wzyx    [..., 0] -= z_move
+            Wzyx    [..., 0] -= (z_move * mask)
             # fig, ax = wc_3d_plot(Wzyx[..., ::-1], mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z
 
             # Wzyx_3D_good_to_v = Wzyx_w_M[...,0 : 3].copy()   ### 嘗試幾次後，這樣子比較好看，剛好變 xyz很好視覺化
             # Wzyx_3D_good_to_v = Wzyx_3D_good_to_v[...,::-1]  ### 嘗試幾次後，這樣子比較好看，剛好變 xyz很好視覺化
             # fig, ax = wc_3d_plot(Wzyx_3D_good_to_v, mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z
-            Wzyx_w_M[..., 0] -= z_move
+            Wzyx_w_M[..., 0] -= (z_move * mask )
             # Wzyx_3D_good_to_v = Wzyx_w_M[...,0 : 3].copy()   ### 嘗試幾次後，這樣子比較好看，剛好變 xyz很好視覺化
             # Wzyx_3D_good_to_v = Wzyx_3D_good_to_v[...,::-1]  ### 嘗試幾次後，這樣子比較好看，剛好變 xyz很好視覺化
             # fig, ax = wc_3d_plot(Wzyx_3D_good_to_v, mask, fewer_point=True, small_size=(300, 300), ax_size=5, ch0_min=-1.2280148, ch0_max=1.2387834, ch1_min=-1.2410645, ch1_max=1.2485291, ch2_min=-0.67187124, ch2_max=0.63452387)  ### ch0:x, ch1:y, ch2:z

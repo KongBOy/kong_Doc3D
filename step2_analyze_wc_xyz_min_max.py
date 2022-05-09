@@ -119,6 +119,15 @@ def F_ow_W_ch_min_max(data_paths, task_amount, core_amount=10, print_msg=False):
             ch2_maxs.max() 1.2273213
             ch2_mins.min() -1.2297894
             total_cost_time: 2367.5690183639526
+
+        wc 19
+            ch0_maxs.max() 0.4421169
+            ch0_mins.min() -0.47946426
+            ch1_maxs.max() 1.2300093
+            ch1_mins.min() -1.229918
+            ch2_maxs.max() 1.2098893
+            ch2_mins.min() -1.2277281
+            total_cost_time: 14.63512635231018
     """
 
 def _F_ow_W_ch_min_max_multiprocess(data_paths, ch0_maxs, ch0_mins, ch1_maxs, ch1_mins, ch2_maxs, ch2_mins, core_amount, task_amount, print_msg=False):
@@ -236,7 +245,8 @@ if(__name__ == "__main__"):
     ### 分析1：找 整個DB 所有 wc 各個channel 的 min/max
     # F_ow_W_ch_min_max(wc_paths, datas_amount, core_amount = datas_amount // 150)  ### core_amount 這樣設可避免 爆記憶體 喔
     # F_ow_W_ch_min_max(uv_paths, datas_amount, core_amount = datas_amount // 150)  ### core_amount 這樣設可避免 爆記憶體 喔
-    # F_ow_W_ch_min_max(kong_doc3D.uv_npy_paths   , datas_amount, core_amount=datas_amount // 150)  ### core_amount 這樣設可避免 爆記憶體 喔
+    # F_ow_W_ch_min_max(wc_paths, datas_amount, core_amount=datas_amount // 150)  ### core_amount 這樣設可避免 爆記憶體 喔
+    # F_ow_W_ch_min_max(uv_paths, datas_amount, core_amount=datas_amount // 150)  ### core_amount 這樣設可避免 爆記憶體 喔
     F_ow_W_ch_min_max(kong_doc3D.W_w_M_npy_paths, datas_amount, core_amount=datas_amount // 150)  ### core_amount 這樣設可避免 爆記憶體 喔
 
     ### 分析2
