@@ -12,7 +12,7 @@ dtd_img_root_write_str = "/dtd/images"  ### 最前面一訂要加 / 喔！ 為�
 dtd_img_dirs = os.listdir(dtd_img_root_read_dir)
 names = []
 for img_dir in dtd_img_dirs:
-    names += [dtd_img_root_write_str + "/" + img_dir + "/" + name for name in os.listdir(dtd_img_root_read_dir + "/" + img_dir)]
+    names += [dtd_img_root_write_str + "/" + img_dir + "/" + name for name in os.listdir(dtd_img_root_read_dir + "/" + img_dir) if ".jpg" in name]
 
 with open(aug_path, "w") as f:
     for name in names:
