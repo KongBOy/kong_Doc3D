@@ -203,7 +203,8 @@ class Fake_Doc3D(Doc3D):  ### 只是為了好閱讀寫的， 給 Make_Doc3D 做�
 # real_doc3D = Doc3D(root="G:/swat3D")  ### VAIO 電腦
 # real_doc3D = Doc3D(root="K:/swat3D")  ### 127.35
 # real_doc3D = Doc3D(root="G:/swat3D")  ### 127.23 2022/04/11
-real_doc3D = Doc3D(root="G:/swat3D")         ### 127.23 2022/05/04
+# real_doc3D = Doc3D(root="G:/swat3D")         ### 127.23 2022/05/04
+real_doc3D = Doc3D(root="J:/swat3D")         ### 127.27 2022/05/12
 
 
 ### 可以做一個小規模的 模擬Real_Doc3D 的 Fake_Doc3D
