@@ -94,7 +94,7 @@ def _dis_img_and_rec_hope(start_index, amount, doc3d, dst_dict, use_sep_name, jo
                 dis_img         = cv2.imread(doc3d.dis_img_paths[i])
                 uv              = np.load(doc3d.uv_npy_paths [i])
 
-            bm  = use_flow_to_get_bm(flow=uv, flow_scale=448)
+            bm  = use_flow_to_get_bm(flow=uv)
             rec = use_bm_to_rec_img(bm=bm, dis_img=dis_img, flow_scale=448)
             cv2.imwrite(rec_hope_path, rec)
 
